@@ -6,6 +6,7 @@ namespace Roave\BetterReflection\Reflection\Adapter;
 
 use ReflectionType as CoreReflectionType;
 use Roave\BetterReflection\Reflection\ReflectionType as BetterReflectionType;
+use Roave\BetterReflection\Reflection\ReflectionNamedType as BetterReflectionNamedType;
 
 class ReflectionType extends CoreReflectionType
 {
@@ -37,12 +38,6 @@ class ReflectionType extends CoreReflectionType
 
     public function isBuiltin(): bool
     {
-        $type = (string) $this->betterReflectionType;
-
-        if ($type === 'self' || $type === 'parent' || $type === 'static') {
-            return false;
-        }
-
-        return $this->betterReflectionType->isBuiltin();
+        return $this->betterReflectionType instanceof BetterReflectionNamedType ? $this->betterReflectionType->isBuiltin() : false;
     }
 }
