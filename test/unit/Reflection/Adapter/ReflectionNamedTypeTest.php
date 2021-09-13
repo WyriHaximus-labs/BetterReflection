@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Roave\BetterReflectionTest\Reflection\Adapter;
 
+use PhpParser\Node\Identifier;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass as CoreReflectionClass;
 use ReflectionNamedType as CoreReflectionNamedType;
@@ -85,7 +86,7 @@ class ReflectionNamedTypeTest extends TestCase
     {
         $reflector = $this->createMock(Reflector::class);
         assert($reflector instanceof Reflector);
-        $betterReflectionType  = BetterReflectionType::createFromTypeAndReflector('self', false, $reflector);
+        $betterReflectionType  = BetterReflectionType::createFromTypeAndReflector(new Identifier('self'));
         $reflectionTypeAdapter = new ReflectionNamedTypeAdapter($betterReflectionType);
 
         self::assertFalse($reflectionTypeAdapter->isBuiltin());
@@ -95,7 +96,7 @@ class ReflectionNamedTypeTest extends TestCase
     {
         $reflector = $this->createMock(Reflector::class);
         assert($reflector instanceof Reflector);
-        $betterReflectionType  = BetterReflectionType::createFromTypeAndReflector('parent', false, $reflector);
+        $betterReflectionType  = BetterReflectionType::createFromTypeAndReflector(new Identifier('parent'));
         $reflectionTypeAdapter = new ReflectionNamedTypeAdapter($betterReflectionType);
 
         self::assertFalse($reflectionTypeAdapter->isBuiltin());
@@ -105,7 +106,7 @@ class ReflectionNamedTypeTest extends TestCase
     {
         $reflector = $this->createMock(Reflector::class);
         assert($reflector instanceof Reflector);
-        $betterReflectionType  = BetterReflectionType::createFromTypeAndReflector('static', false, $reflector);
+        $betterReflectionType  = BetterReflectionType::createFromTypeAndReflector(new Identifier('static'));
         $reflectionTypeAdapter = new ReflectionNamedTypeAdapter($betterReflectionType);
 
         self::assertFalse($reflectionTypeAdapter->isBuiltin());
