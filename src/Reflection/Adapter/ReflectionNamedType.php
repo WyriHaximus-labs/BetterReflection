@@ -16,15 +16,6 @@ class ReflectionNamedType extends CoreReflectionNamedType
         $this->betterReflectionType = $betterReflectionType;
     }
 
-    public static function fromReturnTypeOrNull(?BetterReflectionNamedType $betterReflectionType): ?self
-    {
-        if ($betterReflectionType === null) {
-            return null;
-        }
-
-        return new self($betterReflectionType);
-    }
-
     public function getName(): string
     {
         return $this->betterReflectionType->getName();

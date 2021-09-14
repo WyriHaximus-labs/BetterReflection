@@ -23,9 +23,9 @@ abstract class ReflectionType
      *
      * @return ReflectionNamedType|ReflectionUnionType
      */
-    public static function createFromTypeAndReflector($type): self
+    public static function createFromTypeAndReflector($type, bool $forceAllowsNull = false): self
     {
-        $allowsNull = false;
+        $allowsNull = $forceAllowsNull;
         if ($type instanceof NullableType) {
             $type       = $type->type;
             $allowsNull = true;

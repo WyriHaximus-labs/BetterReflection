@@ -9,10 +9,6 @@ use PhpParser\Node\Identifier;
 use PhpParser\Node\NullableType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Roave\BetterReflection\Reflection\Exception\ClassDoesNotExist;
-use Roave\BetterReflection\Reflection\Exception\ReflectionTypeDoesNotPointToAClassAlikeType;
-use Roave\BetterReflection\Reflection\Reflection;
-use Roave\BetterReflection\Reflection\ReflectionClass;
 use Roave\BetterReflection\Reflection\ReflectionNamedType;
 use Roave\BetterReflection\Reflection\ReflectionType;
 use Roave\BetterReflection\Reflector\Reflector;
@@ -117,53 +113,5 @@ class ReflectionTypeTest extends TestCase
 
         self::assertSame('Foo\Bar\Baz', (string) ReflectionType::createFromTypeAndReflector(new Identifier('Foo\Bar\Baz'))->getName());
         self::assertSame('\Foo\Bar\Baz', (string) ReflectionType::createFromTypeAndReflector(new Identifier('\Foo\Bar\Baz'))->getName());
-    }
-
-    public function testWillDisallowFetchingTargetClassForInternalTypes(): void
-    {
-        $type = ReflectionType::createFromTypeAndReflector(new NullableType(new Identifier('int')));
-
-        $this
-            ->reflector
-            ->expects(self::never())
-            ->method('reflect');
-
-        $this->expectException(ReflectionTypeDoesNotPointToAClassAlikeType::class);
-
-        $type->targetReflectionClass();
-    }
-
-    public function testWillDisallowRetrievingIncompatibleReflectionTypesForClassTypes(): void
-    {
-        $type = ReflectionType::createFromTypeAndReflector(new NullableType(new Identifier('Foo\Bar')));
-
-        $reflection = $this->createMock(Reflection::class);
-
-        $this
-            ->reflector
-            ->expects(self::once())
-            ->method('reflect')
-            ->with('Foo\Bar')
-            ->willReturn($reflection);
-
-        $this->expectException(ClassDoesNotExist::class);
-
-        $type->targetReflectionClass();
-    }
-
-    public function testWillRetrieveTargetClass(): void
-    {
-        $type = ReflectionType::createFromTypeAndReflector(new NullableType(new Identifier('Foo\Bar')));
-
-        $reflection = $this->createMock(ReflectionClass::class);
-
-        $this
-            ->reflector
-            ->expects(self::any())
-            ->method('reflect')
-            ->with('Foo\Bar')
-            ->willReturn($reflection);
-
-        self::assertSame($reflection, $type->targetReflectionClass());
     }
 }

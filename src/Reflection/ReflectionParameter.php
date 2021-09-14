@@ -372,7 +372,9 @@ class ReflectionParameter
             return null;
         }
 
-        return ReflectionType::createFromTypeAndReflector($type);
+        $allowsNull = $this->isDefaultValueAvailable() && $this->getDefaultValue() === null && ! $this->isDefaultValueConstant();
+
+        return ReflectionType::createFromTypeAndReflector($type, $allowsNull);
     }
 
     /**

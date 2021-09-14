@@ -181,6 +181,6 @@ class ReflectionParameter extends CoreReflectionParameter
 
     public function getType(): ?ReflectionType
     {
-        return ReflectionNamedType::fromReturnTypeOrNull($this->betterReflectionParameter->getType());
+        return ReflectionType::fromTypeOrNull($this->betterReflectionParameter->getType());
     }
 }
