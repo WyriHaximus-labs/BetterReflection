@@ -21,7 +21,7 @@ class ReflectionUnionType extends CoreReflectionUnionType
     }
 
     /**
-     * @return CoreReflectionType[]
+     * @return array<ReflectionNamedType|ReflectionType|ReflectionUnionType|null>
      */
     public function getTypes(): array
     {
