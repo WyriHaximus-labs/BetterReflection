@@ -9,31 +9,39 @@ use PhpParser\Node\UnionType;
 use function array_map;
 use function implode;
 
-class ReflectionUnionType extends ReflectionType
+class ReflectionUnionType
 {
-    /** @var ReflectionType[] */
+    /** @var non-empty-list<ReflectionNamedType|ReflectionUnionType> */
     private array $types;
+
+    private bool $allowsNull;
 
     public function __construct(UnionType $type, bool $allowsNull)
     {
-        parent::__construct($allowsNull);
-        $this->types = array_map(static function ($type): ReflectionType {
+        $this->types = array_map(static function ($type): ReflectionNamedType|ReflectionUnionType {
             return ReflectionType::createFromTypeAndReflector($type);
         }, $type->types);
+        $this->allowsNull = $allowsNull;
     }
 
     /**
-     * @return ReflectionType[]
+     * @return non-empty-list<ReflectionNamedType|ReflectionUnionType>
      */
     public function getTypes(): array
     {
         return $this->types;
     }
 
+    /**
+     * Does the parameter allow null?
+     */
+    public function allowsNull(): bool
+    {
+        return $this->allowsNull;
+    }
+
     public function __toString(): string
     {
-        return implode('|', array_map(static function (ReflectionType $type): string {
-            return (string) $type;
-        }, $this->types));
+        return implode('|', array_map(static fn (ReflectionNamedType|ReflectionUnionType $type): string => $type->__toString(), $this->types));
     }
 }

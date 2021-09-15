@@ -9,21 +9,12 @@ use PhpParser\Node\Name;
 use PhpParser\Node\NullableType;
 use PhpParser\Node\UnionType;
 
-abstract class ReflectionType
+final class ReflectionType
 {
-    private bool $allowsNull;
-
-    protected function __construct(bool $allowsNull)
-    {
-        $this->allowsNull = $allowsNull;
-    }
-
     /**
      * @param Identifier|Name|NullableType|UnionType $type
-     *
-     * @return ReflectionNamedType|ReflectionUnionType
      */
-    public static function createFromTypeAndReflector($type, bool $forceAllowsNull = false): self
+    public static function createFromTypeAndReflector($type, bool $forceAllowsNull = false): ReflectionNamedType|ReflectionUnionType
     {
         $allowsNull = $forceAllowsNull;
         if ($type instanceof NullableType) {
@@ -37,17 +28,4 @@ abstract class ReflectionType
 
         return new ReflectionUnionType($type, $allowsNull);
     }
-
-    /**
-     * Does the parameter allow null?
-     */
-    public function allowsNull(): bool
-    {
-        return $this->allowsNull;
-    }
-
-    /**
-     * Convert this string type to a string
-     */
-    abstract public function __toString(): string;
 }

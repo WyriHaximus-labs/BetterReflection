@@ -10,7 +10,7 @@ use PhpParser\Node\Name;
 use function array_key_exists;
 use function strtolower;
 
-class ReflectionNamedType extends ReflectionType
+class ReflectionNamedType
 {
     private const BUILT_IN_TYPES = [
         'int'      => null,
@@ -31,13 +31,15 @@ class ReflectionNamedType extends ReflectionType
 
     private string $name;
 
+    private bool $allowsNull;
+
     /**
      * @param Identifier|Name $type
      */
     public function __construct($type, bool $allowsNull)
     {
-        parent::__construct($allowsNull);
-        $this->name = (string) $type;
+        $this->name = $type->__toString();
+        $this->allowsNull = $allowsNull;
     }
 
     public function getName(): string
@@ -53,6 +55,14 @@ class ReflectionNamedType extends ReflectionType
     public function isBuiltin(): bool
     {
         return array_key_exists(strtolower($this->name), self::BUILT_IN_TYPES);
+    }
+
+    /**
+     * Does the parameter allow null?
+     */
+    public function allowsNull(): bool
+    {
+        return $this->allowsNull;
     }
 
     public function __toString(): string
