@@ -38,7 +38,7 @@ final class ReflectionParameterStringCast
             return '';
         }
 
-        return (string) $parameterReflection->getType() . ' ';
+        return $parameterReflection->getType()?->__toString() . ' ';
     }
 
     private static function valueToString(ReflectionParameter $parameterReflection): string

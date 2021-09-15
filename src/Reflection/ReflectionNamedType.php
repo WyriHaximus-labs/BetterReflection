@@ -37,7 +37,7 @@ class ReflectionNamedType extends ReflectionType
     public function __construct($type, bool $allowsNull)
     {
         parent::__construct($allowsNull);
-        $this->name = (string) $type;
+        $this->name = $type->__toString();
     }
 
     public function getName(): string

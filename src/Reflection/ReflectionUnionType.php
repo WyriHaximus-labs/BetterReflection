@@ -11,7 +11,7 @@ use function implode;
 
 class ReflectionUnionType extends ReflectionType
 {
-    /** @var ReflectionType[] */
+    /** @var non-empty-list<ReflectionType> */
     private array $types;
 
     public function __construct(UnionType $type, bool $allowsNull)
@@ -23,7 +23,7 @@ class ReflectionUnionType extends ReflectionType
     }
 
     /**
-     * @return ReflectionType[]
+     * @return non-empty-list<ReflectionType>
      */
     public function getTypes(): array
     {
@@ -32,8 +32,6 @@ class ReflectionUnionType extends ReflectionType
 
     public function __toString(): string
     {
-        return implode('|', array_map(static function (ReflectionType $type): string {
-            return (string) $type;
-        }, $this->types));
+        return implode('|', array_map(static fn (ReflectionType $type): string => $type->__toString(), $this->types));
     }
 }

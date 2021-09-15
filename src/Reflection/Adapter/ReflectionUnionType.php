@@ -20,13 +20,11 @@ class ReflectionUnionType extends CoreReflectionUnionType
     }
 
     /**
-     * @return array<ReflectionNamedType|ReflectionType|ReflectionUnionType|null>
+     * @return non-empty-list<ReflectionNamedType|ReflectionType|ReflectionUnionType|null>
      */
     public function getTypes(): array
     {
-        return array_map(static function (BetterReflectionType $type) {
-            return ReflectionType::fromTypeOrNull($type);
-        }, $this->betterReflectionType->getTypes());
+        return array_map(static fn (BetterReflectionType $type) => ReflectionType::fromTypeOrNull($type), $this->betterReflectionType->getTypes());
     }
 
     public function __toString(): string
