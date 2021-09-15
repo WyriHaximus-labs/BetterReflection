@@ -165,6 +165,10 @@ class ReflectionClass implements Reflection
         return sprintf('%s%s%c%s(%d)', $this->getAnonymousClassNamePrefix(), self::ANONYMOUS_CLASS_NAME_SUFFIX, "\0", $fileName, $this->getStartLine());
     }
 
+    /**
+     * PHP creates the name of the anonymous class based on first parent
+     * or implemented interface.
+     */
     private function getAnonymousClassNamePrefix(): string
     {
         $parentClassNames = $this->getParentClassNames();
