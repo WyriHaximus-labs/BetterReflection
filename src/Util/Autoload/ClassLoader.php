@@ -49,10 +49,10 @@ final class ClassLoader
     /**
      * @throws FailedToLoadClass
      */
-    public function __invoke(string $classToLoad): void
+    public function __invoke(string $classToLoad): bool
     {
         if (! array_key_exists($classToLoad, $this->reflections)) {
-            return;
+            return false;
         }
 
         $this->loaderMethod->__invoke($this->reflections[$classToLoad]);
@@ -64,5 +64,7 @@ final class ClassLoader
         ) {
             throw Exception\FailedToLoadClass::fromClassName($classToLoad);
         }
+
+        return true;
     }
 }
