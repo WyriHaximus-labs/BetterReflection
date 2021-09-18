@@ -13,10 +13,8 @@ use Roave\BetterReflection\Reflection\ReflectionClass;
 use Roave\BetterReflection\Reflection\ReflectionConstant;
 use Roave\BetterReflection\Reflection\ReflectionMethod;
 use Roave\BetterReflection\Reflection\ReflectionParameter;
-use Roave\BetterReflection\Reflector\ClassReflector;
-use Roave\BetterReflection\Reflector\ConstantReflector;
 use Roave\BetterReflection\Reflector\Exception\IdentifierNotFound;
-use Roave\BetterReflection\Reflector\FunctionReflector;
+use Roave\BetterReflection\Reflector\Reflector;
 use Roave\BetterReflection\SourceLocator\SourceStubber\PhpStormStubsSourceStubber;
 use Roave\BetterReflection\SourceLocator\Type\PhpInternalSourceLocator;
 use Roave\BetterReflection\Util\FileHelper;
@@ -46,11 +44,7 @@ class PhpStormStubsSourceStubberTest extends TestCase
 
     private PhpInternalSourceLocator $phpInternalSourceLocator;
 
-    private ClassReflector $classReflector;
-
-    private FunctionReflector $functionReflector;
-
-    private ConstantReflector $constantReflector;
+    private Reflector $reflector;
 
     protected function setUp(): void
     {
@@ -63,9 +57,7 @@ class PhpStormStubsSourceStubberTest extends TestCase
             $betterReflection->astLocator(),
             $this->sourceStubber,
         );
-        $this->classReflector           = new ClassReflector($this->phpInternalSourceLocator);
-        $this->functionReflector        = new FunctionReflector($this->phpInternalSourceLocator, $this->classReflector);
-        $this->constantReflector        = new ConstantReflector($this->phpInternalSourceLocator, $this->classReflector);
+        $this->reflector                = new Reflector($this->phpInternalSourceLocator);
     }
 
     /**
@@ -102,7 +94,7 @@ class PhpStormStubsSourceStubberTest extends TestCase
      */
     public function testInternalClasses(string $className): void
     {
-        $class = $this->classReflector->reflect($className);
+        $class = $this->reflector->reflectClass($className);
 
         self::assertInstanceOf(ReflectionClass::class, $class);
         self::assertSame($className, $class->getName());
@@ -295,7 +287,7 @@ class PhpStormStubsSourceStubberTest extends TestCase
      */
     public function testInternalFunctions(string $functionName): void
     {
-        $stubbedReflection = $this->functionReflector->reflect($functionName);
+        $stubbedReflection = $this->reflector->reflectFunction($functionName);
 
         self::assertSame($functionName, $stubbedReflection->getName());
         self::assertTrue($stubbedReflection->isInternal());
@@ -399,7 +391,7 @@ class PhpStormStubsSourceStubberTest extends TestCase
      */
     public function testInternalConstants(string $constantName, mixed $constantValue, string $extensionName): void
     {
-        $constantReflection = $this->constantReflector->reflect($constantName);
+        $constantReflection = $this->reflector->reflectConstant($constantName);
 
         self::assertInstanceOf(ReflectionConstant::class, $constantReflection);
         self::assertSame($constantName, $constantReflection->getName());
@@ -437,7 +429,7 @@ class PhpStormStubsSourceStubberTest extends TestCase
      */
     public function testClassInNamespace(string $className): void
     {
-        $classReflection = $this->classReflector->reflect($className);
+        $classReflection = $this->reflector->reflectClass($className);
 
         $this->assertSame($className, $classReflection->getName());
     }
@@ -456,7 +448,7 @@ class PhpStormStubsSourceStubberTest extends TestCase
      */
     public function testFunctionInNamespace(string $functionName): void
     {
-        $functionReflection = $this->functionReflector->reflect($functionName);
+        $functionReflection = $this->reflector->reflectFunction($functionName);
 
         $this->assertSame($functionName, $functionReflection->getName());
     }
@@ -475,7 +467,7 @@ class PhpStormStubsSourceStubberTest extends TestCase
      */
     public function testConstantInNamespace(string $constantName): void
     {
-        $constantReflection = $this->constantReflector->reflect($constantName);
+        $constantReflection = $this->reflector->reflectConstant($constantName);
 
         $this->assertSame($constantName, $constantReflection->getName());
     }
@@ -514,7 +506,7 @@ class PhpStormStubsSourceStubberTest extends TestCase
      */
     public function testCaseInsensitiveClass(string $className, string $expectedClassName): void
     {
-        $classReflection = $this->classReflector->reflect($className);
+        $classReflection = $this->reflector->reflectClass($className);
 
         $this->assertSame($expectedClassName, $classReflection->getName());
     }
@@ -538,7 +530,7 @@ class PhpStormStubsSourceStubberTest extends TestCase
      */
     public function testCaseInsensitiveFunction(string $functionName, string $expectedFunctionName): void
     {
-        $functionReflection = $this->functionReflector->reflect($functionName);
+        $functionReflection = $this->reflector->reflectFunction($functionName);
 
         $this->assertSame($expectedFunctionName, $functionReflection->getName());
     }
@@ -566,9 +558,9 @@ class PhpStormStubsSourceStubberTest extends TestCase
      */
     public function testCaseInsensitiveConstant(string $constantName, string $expectedConstantName): void
     {
-        $constantReflector = $this->constantReflector->reflect($constantName);
+        $reflector = $this->reflector->reflectConstant($constantName);
 
-        $this->assertSame($expectedConstantName, $constantReflector->getName());
+        $this->assertSame($expectedConstantName, $reflector->getName());
     }
 
     public function dataCaseSensitiveConstant(): array
@@ -587,7 +579,7 @@ class PhpStormStubsSourceStubberTest extends TestCase
     {
         self::expectException(IdentifierNotFound::class);
 
-        $this->constantReflector->reflect($constantName);
+        $this->reflector->reflectConstant($constantName);
     }
 
     /**

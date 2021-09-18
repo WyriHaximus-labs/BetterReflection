@@ -12,9 +12,9 @@ use Roave\BetterReflection\Reflection\Adapter\Exception\NotImplemented;
 use Roave\BetterReflection\Reflection\Exception\FunctionDoesNotExist;
 use Roave\BetterReflection\Reflection\StringCast\ReflectionFunctionStringCast;
 use Roave\BetterReflection\Reflector\Exception\IdentifierNotFound;
-use Roave\BetterReflection\Reflector\FunctionReflector;
 use Roave\BetterReflection\Reflector\Reflector;
 use Roave\BetterReflection\SourceLocator\Located\LocatedSource;
+use Roave\BetterReflection\SourceLocator\Type\AggregateSourceLocator;
 use Roave\BetterReflection\SourceLocator\Type\ClosureSourceLocator;
 
 use function function_exists;
@@ -26,7 +26,7 @@ class ReflectionFunction extends ReflectionFunctionAbstract implements Reflectio
      */
     public static function createFromName(string $functionName): self
     {
-        return (new BetterReflection())->functionReflector()->reflect($functionName);
+        return (new BetterReflection())->reflector()->reflectFunction($functionName);
     }
 
     /**
@@ -36,10 +36,10 @@ class ReflectionFunction extends ReflectionFunctionAbstract implements Reflectio
     {
         $configuration = new BetterReflection();
 
-        return (new FunctionReflector(
+        return (new Reflector(new AggregateSourceLocator([
+            $configuration->sourceLocator(),
             new ClosureSourceLocator($closure, $configuration->phpParser()),
-            $configuration->classReflector(),
-        ))->reflect(self::CLOSURE_NAME);
+        ])))->reflectFunction(self::CLOSURE_NAME);
     }
 
     public function __toString(): string

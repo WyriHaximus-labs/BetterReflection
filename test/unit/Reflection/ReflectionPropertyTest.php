@@ -21,7 +21,7 @@ use Roave\BetterReflection\Reflection\Exception\NotAnObject;
 use Roave\BetterReflection\Reflection\Exception\ObjectNotInstanceOfClass;
 use Roave\BetterReflection\Reflection\Exception\Uncloneable;
 use Roave\BetterReflection\Reflection\ReflectionProperty;
-use Roave\BetterReflection\Reflector\ClassReflector;
+use Roave\BetterReflection\Reflector\Reflector;
 use Roave\BetterReflection\SourceLocator\Ast\Locator;
 use Roave\BetterReflection\SourceLocator\Type\ComposerSourceLocator;
 use Roave\BetterReflection\SourceLocator\Type\SingleFileSourceLocator;
@@ -45,7 +45,7 @@ use function count;
  */
 class ReflectionPropertyTest extends TestCase
 {
-    private ClassReflector $reflector;
+    private Reflector $reflector;
 
     private Locator $astLocator;
 
@@ -54,7 +54,7 @@ class ReflectionPropertyTest extends TestCase
         parent::setUp();
 
         $this->astLocator = BetterReflectionSingleton::instance()->astLocator();
-        $this->reflector  = new ClassReflector(new ComposerSourceLocator($GLOBALS['loader'], $this->astLocator));
+        $this->reflector  = new Reflector(new ComposerSourceLocator($GLOBALS['loader'], $this->astLocator));
     }
 
     public function testCreateFromName(): void
@@ -75,7 +75,7 @@ class ReflectionPropertyTest extends TestCase
 
     public function testVisibilityMethods(): void
     {
-        $classInfo = $this->reflector->reflect(ExampleClass::class);
+        $classInfo = $this->reflector->reflectClass(ExampleClass::class);
 
         $privateProp = $classInfo->getProperty('privateProperty');
         self::assertTrue($privateProp->isPrivate());
@@ -89,7 +89,7 @@ class ReflectionPropertyTest extends TestCase
 
     public function testIsStatic(): void
     {
-        $classInfo = $this->reflector->reflect(ExampleClass::class);
+        $classInfo = $this->reflector->reflectClass(ExampleClass::class);
 
         $publicProp = $classInfo->getProperty('publicProperty');
         self::assertFalse($publicProp->isStatic());
@@ -117,7 +117,7 @@ class ReflectionPropertyTest extends TestCase
      */
     public function testGetDocBlockTypeStrings(string $propertyName, array $expectedTypes): void
     {
-        $classInfo = $this->reflector->reflect(ExampleClass::class);
+        $classInfo = $this->reflector->reflectClass(ExampleClass::class);
 
         $property = $classInfo->getProperty($propertyName);
 
@@ -143,7 +143,7 @@ class ReflectionPropertyTest extends TestCase
      */
     public function testGetDocBlockTypes(string $propertyName, array $expectedTypes): void
     {
-        $classInfo = $this->reflector->reflect(ExampleClass::class);
+        $classInfo = $this->reflector->reflectClass(ExampleClass::class);
 
         $foundTypes = $classInfo->getProperty($propertyName)->getDocBlockTypes();
 
@@ -158,7 +158,7 @@ class ReflectionPropertyTest extends TestCase
     {
         $expectedDoc = "/**\n * @var string\n */";
 
-        $classInfo = $this->reflector->reflect(ExampleClass::class);
+        $classInfo = $this->reflector->reflectClass(ExampleClass::class);
         $property  = $classInfo->getProperty('publicProperty');
 
         self::assertSame($expectedDoc, $property->getDocComment());
@@ -174,7 +174,7 @@ class ReflectionPropertyTest extends TestCase
                 public $prop;
             }
         ';
-        $reflector = (new ClassReflector(new StringSourceLocator($php, $this->astLocator)))->reflect('Bar');
+        $reflector = (new Reflector(new StringSourceLocator($php, $this->astLocator)))->reflectClass('Bar');
         $property  = $reflector->getProperty('prop');
 
         self::assertStringContainsString('Property description', $property->getDocComment());
@@ -182,7 +182,7 @@ class ReflectionPropertyTest extends TestCase
 
     public function testGetDocCommentReturnsEmptyStringWithNoComment(): void
     {
-        $classInfo = $this->reflector->reflect(ExampleClass::class);
+        $classInfo = $this->reflector->reflectClass(ExampleClass::class);
         $property  = $classInfo->getProperty('publicStaticProperty');
 
         self::assertSame('', $property->getDocComment());
@@ -205,7 +205,7 @@ class ReflectionPropertyTest extends TestCase
      */
     public function testGetModifiers(string $propertyName, int $expectedModifier, array $expectedModifierNames): void
     {
-        $classInfo = $this->reflector->reflect(ExampleClass::class);
+        $classInfo = $this->reflector->reflectClass(ExampleClass::class);
         $property  = $classInfo->getProperty($propertyName);
 
         self::assertSame($expectedModifier, $property->getModifiers());
@@ -217,7 +217,7 @@ class ReflectionPropertyTest extends TestCase
 
     public function testIsPromoted(): void
     {
-        $classInfo = $this->reflector->reflect(ExampleClass::class);
+        $classInfo = $this->reflector->reflectClass(ExampleClass::class);
 
         $promotedProperty = $classInfo->getProperty('promotedProperty');
 
@@ -231,7 +231,7 @@ class ReflectionPropertyTest extends TestCase
 
     public function testIsDefault(): void
     {
-        $classInfo = $this->reflector->reflect(ExampleClass::class);
+        $classInfo = $this->reflector->reflectClass(ExampleClass::class);
 
         self::assertTrue($classInfo->getProperty('publicProperty')->isDefault());
         self::assertTrue($classInfo->getProperty('publicStaticProperty')->isDefault());
@@ -239,7 +239,7 @@ class ReflectionPropertyTest extends TestCase
 
     public function testIsDefaultWithRuntimeDeclaredProperty(): void
     {
-        $classInfo = $this->reflector->reflect(ExampleClass::class);
+        $classInfo = $this->reflector->reflectClass(ExampleClass::class);
 
         self::assertFalse(
             ReflectionProperty::createFromNode(
@@ -258,7 +258,7 @@ class ReflectionPropertyTest extends TestCase
 
     public function testToString(): void
     {
-        $classInfo = $this->reflector->reflect(ExampleClass::class);
+        $classInfo = $this->reflector->reflectClass(ExampleClass::class);
         self::assertSame('Property [ <default> public $publicProperty ]', (string) $classInfo->getProperty('publicProperty'));
     }
 
@@ -279,7 +279,7 @@ class ReflectionPropertyTest extends TestCase
      */
     public function testPropertyDefaultValue(string $propertyName, bool $hasDefaultValue, mixed $defaultValue): void
     {
-        $classInfo = (new ClassReflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/DefaultProperties.php', $this->astLocator)))->reflect('Foo');
+        $classInfo = (new Reflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/DefaultProperties.php', $this->astLocator)))->reflectClass('Foo');
         $property  = $classInfo->getProperty($propertyName);
 
         self::assertSame($hasDefaultValue, $property->hasDefaultValue());
@@ -288,7 +288,7 @@ class ReflectionPropertyTest extends TestCase
 
     public function testCannotClone(): void
     {
-        $classInfo  = $this->reflector->reflect(ExampleClass::class);
+        $classInfo  = $this->reflector->reflectClass(ExampleClass::class);
         $publicProp = $classInfo->getProperty('publicProperty');
 
         $this->expectException(Uncloneable::class);
@@ -297,7 +297,7 @@ class ReflectionPropertyTest extends TestCase
 
     public function testSetVisibility(): void
     {
-        $classInfo  = $this->reflector->reflect(ExampleClass::class);
+        $classInfo  = $this->reflector->reflectClass(ExampleClass::class);
         $publicProp = $classInfo->getProperty('publicStaticProperty');
 
         self::assertFalse($publicProp->isPrivate(), 'Should initially be public, was private');
@@ -329,7 +329,7 @@ class ReflectionPropertyTest extends TestCase
 
     public function testSetVisibilityThrowsExceptionWithInvalidArgument(): void
     {
-        $classInfo  = $this->reflector->reflect(ExampleClass::class);
+        $classInfo  = $this->reflector->reflectClass(ExampleClass::class);
         $publicProp = $classInfo->getProperty('publicProperty');
 
         $this->expectException(InvalidArgumentException::class);
@@ -342,8 +342,8 @@ class ReflectionPropertyTest extends TestCase
      */
     public function testStartEndLine(string $php, int $startLine, int $endLine): void
     {
-        $reflector       = new ClassReflector(new StringSourceLocator($php, $this->astLocator));
-        $classReflection = $reflector->reflect('\T');
+        $reflector       = new Reflector(new StringSourceLocator($php, $this->astLocator));
+        $classReflection = $reflector->reflectClass('\T');
         $constReflection = $classReflection->getProperty('test');
         self::assertEquals($startLine, $constReflection->getStartLine());
         self::assertEquals($endLine, $constReflection->getEndLine());
@@ -373,8 +373,8 @@ class ReflectionPropertyTest extends TestCase
      */
     public function testGetStartColumnAndEndColumn(string $php, int $startColumn, int $endColumn): void
     {
-        $reflector          = new ClassReflector(new StringSourceLocator($php, $this->astLocator));
-        $classReflection    = $reflector->reflect('T');
+        $reflector          = new Reflector(new StringSourceLocator($php, $this->astLocator));
+        $classReflection    = $reflector->reflectClass('T');
         $constantReflection = $classReflection->getProperty('test');
 
         self::assertEquals($startColumn, $constantReflection->getStartColumn());
@@ -407,7 +407,7 @@ class Foo
 }
 PHP;
 
-        $classReflection    = (new ClassReflector(new StringSourceLocator($php, $this->astLocator)))->reflect('Foo');
+        $classReflection    = (new Reflector(new StringSourceLocator($php, $this->astLocator)))->reflectClass('Foo');
         $propertyReflection = $classReflection->getProperty($propertyName);
 
         $ast = $propertyReflection->getAst();
@@ -419,8 +419,8 @@ PHP;
 
     public function testGetDeclaringAndImplementingClassWithPropertyFromTrait(): void
     {
-        $classReflector     = new ClassReflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/ClassWithPropertiesAndTraitProperties.php', $this->astLocator));
-        $classReflection    = $classReflector->reflect(ClassWithPropertiesAndTraitProperties::class);
+        $reflector          = new Reflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/ClassWithPropertiesAndTraitProperties.php', $this->astLocator));
+        $classReflection    = $reflector->reflectClass(ClassWithPropertiesAndTraitProperties::class);
         $propertyReflection = $classReflection->getProperty('propertyFromTrait');
 
         self::assertSame(TraitWithProperty::class, $propertyReflection->getDeclaringClass()->getName());
@@ -430,8 +430,8 @@ PHP;
 
     public function testGetDeclaringAndImplementingClassWithPropertyFromClass(): void
     {
-        $classReflector     = new ClassReflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/ClassWithPropertiesAndTraitProperties.php', $this->astLocator));
-        $classReflection    = $classReflector->reflect(ClassWithPropertiesAndTraitProperties::class);
+        $reflector          = new Reflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/ClassWithPropertiesAndTraitProperties.php', $this->astLocator));
+        $classReflection    = $reflector->reflectClass(ClassWithPropertiesAndTraitProperties::class);
         $propertyReflection = $classReflection->getProperty('propertyFromClass');
 
         self::assertSame(ClassWithPropertiesAndTraitProperties::class, $propertyReflection->getDeclaringClass()->getName());
@@ -441,8 +441,8 @@ PHP;
 
     public function testGetDeclaringAndImplementingClassWithPropertyFromParentClass(): void
     {
-        $classReflector     = new ClassReflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/ClassWithPropertiesAndTraitProperties.php', $this->astLocator));
-        $classReflection    = $classReflector->reflect(ExtendedClassWithPropertiesAndTraitProperties::class)->getParentClass();
+        $reflector          = new Reflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/ClassWithPropertiesAndTraitProperties.php', $this->astLocator));
+        $classReflection    = $reflector->reflectClass(ExtendedClassWithPropertiesAndTraitProperties::class)->getParentClass();
         $propertyReflection = $classReflection->getProperty('propertyFromClass');
 
         self::assertSame(ClassWithPropertiesAndTraitProperties::class, $propertyReflection->getDeclaringClass()->getName());
@@ -455,7 +455,7 @@ PHP;
         $staticPropertyGetSetFixture = __DIR__ . '/../Fixture/StaticPropertyGetSet.php';
         require_once $staticPropertyGetSetFixture;
 
-        $classReflection    = (new ClassReflector(new SingleFileSourceLocator($staticPropertyGetSetFixture, $this->astLocator)))->reflect(StaticPropertyGetSet::class);
+        $classReflection    = (new Reflector(new SingleFileSourceLocator($staticPropertyGetSetFixture, $this->astLocator)))->reflectClass(StaticPropertyGetSet::class);
         $propertyReflection = $classReflection->getProperty('baz');
 
         $propertyReflection->setValue('value');
@@ -469,7 +469,7 @@ PHP;
         $staticPropertyGetSetFixture = __DIR__ . '/../Fixture/StaticPropertyGetSet.php';
         require_once $staticPropertyGetSetFixture;
 
-        $classReflection    = (new ClassReflector(new SingleFileSourceLocator($staticPropertyGetSetFixture, $this->astLocator)))->reflect(StaticPropertyGetSet::class);
+        $classReflection    = (new Reflector(new SingleFileSourceLocator($staticPropertyGetSetFixture, $this->astLocator)))->reflectClass(StaticPropertyGetSet::class);
         $propertyReflection = $classReflection->getProperty('baz');
 
         $propertyReflection->setValue('first', 'second');
@@ -490,7 +490,7 @@ PHP;
 
         $this->expectException(ClassDoesNotExist::class);
 
-        $classReflection    = (new ClassReflector(new StringSourceLocator($php, $this->astLocator)))->reflect('Foo');
+        $classReflection    = (new Reflector(new StringSourceLocator($php, $this->astLocator)))->reflectClass('Foo');
         $propertyReflection = $classReflection->getProperty('boo');
 
         $propertyReflection->setValue(null);
@@ -508,7 +508,7 @@ PHP;
 
         $this->expectException(ClassDoesNotExist::class);
 
-        $classReflection    = (new ClassReflector(new StringSourceLocator($php, $this->astLocator)))->reflect('Foo');
+        $classReflection    = (new Reflector(new StringSourceLocator($php, $this->astLocator)))->reflectClass('Foo');
         $propertyReflection = $classReflection->getProperty('boo');
 
         $propertyReflection->getValue();
@@ -519,7 +519,7 @@ PHP;
         $staticPropertyGetSetFixtureFile = __DIR__ . '/../Fixture/StaticPropertyGetSet.php';
         require_once $staticPropertyGetSetFixtureFile;
 
-        $classReflection    = (new ClassReflector(new SingleFileSourceLocator($staticPropertyGetSetFixtureFile, $this->astLocator)))->reflect(StaticPropertyGetSet::class);
+        $classReflection    = (new Reflector(new SingleFileSourceLocator($staticPropertyGetSetFixtureFile, $this->astLocator)))->reflectClass(StaticPropertyGetSet::class);
         $propertyReflection = $classReflection->getProperty('bat');
 
         $object = new PropertyGetSet();
@@ -534,7 +534,7 @@ PHP;
         $propertyGetSetFixture = __DIR__ . '/../Fixture/PropertyGetSet.php';
         require_once $propertyGetSetFixture;
 
-        $classReflection    = (new ClassReflector(new SingleFileSourceLocator($propertyGetSetFixture, $this->astLocator)))->reflect(PropertyGetSet::class);
+        $classReflection    = (new Reflector(new SingleFileSourceLocator($propertyGetSetFixture, $this->astLocator)))->reflectClass(PropertyGetSet::class);
         $propertyReflection = $classReflection->getProperty('baz');
 
         $object = new PropertyGetSet();
@@ -549,7 +549,7 @@ PHP;
     {
         $this->expectException(NoObjectProvided::class);
 
-        $classReflection    = (new ClassReflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/PropertyGetSet.php', $this->astLocator)))->reflect(PropertyGetSet::class);
+        $classReflection    = (new Reflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/PropertyGetSet.php', $this->astLocator)))->reflectClass(PropertyGetSet::class);
         $propertyReflection = $classReflection->getProperty('baz');
 
         $propertyReflection->setValue(null);
@@ -559,7 +559,7 @@ PHP;
     {
         $this->expectException(NoObjectProvided::class);
 
-        $classReflection    = (new ClassReflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/PropertyGetSet.php', $this->astLocator)))->reflect(PropertyGetSet::class);
+        $classReflection    = (new Reflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/PropertyGetSet.php', $this->astLocator)))->reflectClass(PropertyGetSet::class);
         $propertyReflection = $classReflection->getProperty('baz');
 
         $propertyReflection->getValue();
@@ -569,7 +569,7 @@ PHP;
     {
         $this->expectException(NotAnObject::class);
 
-        $classReflection    = (new ClassReflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/PropertyGetSet.php', $this->astLocator)))->reflect(PropertyGetSet::class);
+        $classReflection    = (new Reflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/PropertyGetSet.php', $this->astLocator)))->reflectClass(PropertyGetSet::class);
         $propertyReflection = $classReflection->getProperty('baz');
 
         $propertyReflection->setValue('string');
@@ -579,7 +579,7 @@ PHP;
     {
         $this->expectException(ObjectNotInstanceOfClass::class);
 
-        $classReflection    = (new ClassReflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/PropertyGetSet.php', $this->astLocator)))->reflect(PropertyGetSet::class);
+        $classReflection    = (new Reflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/PropertyGetSet.php', $this->astLocator)))->reflectClass(PropertyGetSet::class);
         $propertyReflection = $classReflection->getProperty('baz');
 
         $propertyReflection->setValue(new stdClass());
@@ -589,7 +589,7 @@ PHP;
     {
         $this->expectException(ObjectNotInstanceOfClass::class);
 
-        $classReflection    = (new ClassReflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/PropertyGetSet.php', $this->astLocator)))->reflect(PropertyGetSet::class);
+        $classReflection    = (new Reflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/PropertyGetSet.php', $this->astLocator)))->reflectClass(PropertyGetSet::class);
         $propertyReflection = $classReflection->getProperty('baz');
 
         $propertyReflection->getValue(new stdClass());
@@ -600,7 +600,7 @@ PHP;
         $propertyGetSetFixtureFile = __DIR__ . '/../Fixture/PropertyGetSet.php';
         require_once $propertyGetSetFixtureFile;
 
-        $classReflection    = (new ClassReflector(new SingleFileSourceLocator($propertyGetSetFixtureFile, $this->astLocator)))->reflect(PropertyGetSet::class);
+        $classReflection    = (new Reflector(new SingleFileSourceLocator($propertyGetSetFixtureFile, $this->astLocator)))->reflectClass(PropertyGetSet::class);
         $propertyReflection = $classReflection->getProperty('bat');
 
         $object = new PropertyGetSet();
@@ -612,7 +612,7 @@ PHP;
 
     public function testAllowsNull(): void
     {
-        $classReflection = $this->reflector->reflect(Php74PropertyTypeDeclarations::class);
+        $classReflection = $this->reflector->reflectClass(Php74PropertyTypeDeclarations::class);
 
         $integerPropertyReflection = $classReflection->getProperty('integerProperty');
         self::assertFalse($integerPropertyReflection->allowsNull());
@@ -645,7 +645,7 @@ PHP;
         string $propertyName,
         bool $expectedHasType,
     ): void {
-        $classReflection    = $this->reflector->reflect(Php74PropertyTypeDeclarations::class);
+        $classReflection    = $this->reflector->reflectClass(Php74PropertyTypeDeclarations::class);
         $propertyReflection = $classReflection->getProperty($propertyName);
 
         self::assertSame($expectedHasType, $propertyReflection->hasType());
@@ -672,7 +672,7 @@ PHP;
         string $propertyName,
         string $expectedType,
     ): void {
-        $classReflection    = $this->reflector->reflect(Php74PropertyTypeDeclarations::class);
+        $classReflection    = $this->reflector->reflectClass(Php74PropertyTypeDeclarations::class);
         $propertyReflection = $classReflection->getProperty($propertyName);
 
         $type = $propertyReflection->getType();
@@ -685,7 +685,7 @@ PHP;
      */
     public function testSetType(): void
     {
-        $classReflection    = $this->reflector->reflect(Php74PropertyTypeDeclarations::class);
+        $classReflection    = $this->reflector->reflectClass(Php74PropertyTypeDeclarations::class);
         $propertyReflection = $classReflection->getProperty('integerProperty');
 
         $propertyReflection->setType('string');
@@ -702,7 +702,7 @@ PHP;
      */
     public function testRemoveType(): void
     {
-        $classReflection    = $this->reflector->reflect(Php74PropertyTypeDeclarations::class);
+        $classReflection    = $this->reflector->reflectClass(Php74PropertyTypeDeclarations::class);
         $propertyReflection = $classReflection->getProperty('integerProperty');
 
         $propertyReflection->removeType();
@@ -735,7 +735,7 @@ PHP;
      */
     public function testIsInitialized(string $propertyName, ?object $object, bool $isInitialized): void
     {
-        $classReflection = $this->reflector->reflect(InitializedProperties::class);
+        $classReflection = $this->reflector->reflectClass(InitializedProperties::class);
 
         self::assertSame($isInitialized, $classReflection->getProperty($propertyName)->isInitialized($object));
     }
@@ -744,14 +744,14 @@ PHP;
     {
         self::expectException(ObjectNotInstanceOfClass::class);
 
-        $classReflection = $this->reflector->reflect(InitializedProperties::class);
+        $classReflection = $this->reflector->reflectClass(InitializedProperties::class);
         $classReflection->getProperty('withoutType')->isInitialized(new stdClass());
     }
 
     public function testGetAttributesWithoutAttributes(): void
     {
-        $classReflector     = new ClassReflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/ExampleClass.php', $this->astLocator));
-        $classReflection    = $classReflector->reflect(ExampleClass::class);
+        $reflector          = new Reflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/ExampleClass.php', $this->astLocator));
+        $classReflection    = $reflector->reflectClass(ExampleClass::class);
         $propertyReflection = $classReflection->getProperty('privateProperty');
         $attributes         = $propertyReflection->getAttributes();
 
@@ -760,8 +760,8 @@ PHP;
 
     public function testGetAttributesWithAttributes(): void
     {
-        $classReflector     = new ClassReflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/Attributes.php', $this->astLocator));
-        $classReflection    = $classReflector->reflect(ClassWithAttributes::class);
+        $reflector          = new Reflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/Attributes.php', $this->astLocator));
+        $classReflection    = $reflector->reflectClass(ClassWithAttributes::class);
         $propertyReflection = $classReflection->getProperty('propertyWithAttributes');
         $attributes         = $propertyReflection->getAttributes();
 
@@ -770,8 +770,8 @@ PHP;
 
     public function testGetAttributesByName(): void
     {
-        $classReflector     = new ClassReflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/Attributes.php', $this->astLocator));
-        $classReflection    = $classReflector->reflect(ClassWithAttributes::class);
+        $reflector          = new Reflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/Attributes.php', $this->astLocator));
+        $classReflection    = $reflector->reflectClass(ClassWithAttributes::class);
         $propertyReflection = $classReflection->getProperty('propertyWithAttributes');
         $attributes         = $propertyReflection->getAttributesByName(Attr::class);
 

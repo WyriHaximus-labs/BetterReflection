@@ -10,8 +10,7 @@ use PHPUnit\Framework\TestCase;
 use Roave\BetterReflection\Reflection\Adapter\Exception\NotImplemented;
 use Roave\BetterReflection\Reflection\Exception\FunctionDoesNotExist;
 use Roave\BetterReflection\Reflection\ReflectionFunction;
-use Roave\BetterReflection\Reflector\ClassReflector;
-use Roave\BetterReflection\Reflector\FunctionReflector;
+use Roave\BetterReflection\Reflector\Reflector;
 use Roave\BetterReflection\SourceLocator\Ast\Locator;
 use Roave\BetterReflection\SourceLocator\SourceStubber\SourceStubber;
 use Roave\BetterReflection\SourceLocator\Type\PhpInternalSourceLocator;
@@ -27,7 +26,7 @@ use stdClass;
  */
 class ReflectionFunctionTest extends TestCase
 {
-    private ClassReflector $classReflector;
+    private Reflector $reflector;
 
     private Locator $astLocator;
 
@@ -37,18 +36,18 @@ class ReflectionFunctionTest extends TestCase
     {
         parent::setUp();
 
-        $configuration        = BetterReflectionSingleton::instance();
-        $this->classReflector = $configuration->classReflector();
-        $this->astLocator     = $configuration->astLocator();
-        $this->sourceStubber  = $configuration->sourceStubber();
+        $configuration       = BetterReflectionSingleton::instance();
+        $this->reflector     = $configuration->reflector();
+        $this->astLocator    = $configuration->astLocator();
+        $this->sourceStubber = $configuration->sourceStubber();
     }
 
     public function testNameMethodsWithNoNamespace(): void
     {
         $php = '<?php function foo() {}';
 
-        $reflector = new FunctionReflector(new StringSourceLocator($php, $this->astLocator), $this->classReflector);
-        $function  = $reflector->reflect('foo');
+        $reflector = new Reflector(new StringSourceLocator($php, $this->astLocator));
+        $function  = $reflector->reflectFunction('foo');
 
         self::assertFalse($function->inNamespace());
         self::assertSame('foo', $function->getName());
@@ -60,8 +59,8 @@ class ReflectionFunctionTest extends TestCase
     {
         $php = '<?php namespace A\B { function foo() {} }';
 
-        $reflector = new FunctionReflector(new StringSourceLocator($php, $this->astLocator), $this->classReflector);
-        $function  = $reflector->reflect('A\B\foo');
+        $reflector = new Reflector(new StringSourceLocator($php, $this->astLocator));
+        $function  = $reflector->reflectFunction('A\B\foo');
 
         self::assertTrue($function->inNamespace());
         self::assertSame('A\B\foo', $function->getName());
@@ -73,8 +72,8 @@ class ReflectionFunctionTest extends TestCase
     {
         $php = '<?php namespace { function foo() {} }';
 
-        $reflector = new FunctionReflector(new StringSourceLocator($php, $this->astLocator), $this->classReflector);
-        $function  = $reflector->reflect('foo');
+        $reflector = new Reflector(new StringSourceLocator($php, $this->astLocator));
+        $function  = $reflector->reflectFunction('foo');
 
         self::assertFalse($function->inNamespace());
         self::assertSame('foo', $function->getName());
@@ -86,8 +85,8 @@ class ReflectionFunctionTest extends TestCase
     {
         $php = '<?php function foo() {}';
 
-        $reflector = new FunctionReflector(new StringSourceLocator($php, $this->astLocator), $this->classReflector);
-        $function  = $reflector->reflect('foo');
+        $reflector = new Reflector(new StringSourceLocator($php, $this->astLocator));
+        $function  = $reflector->reflectFunction('foo');
 
         self::assertFalse($function->isDisabled());
     }
@@ -96,8 +95,8 @@ class ReflectionFunctionTest extends TestCase
     {
         $php = '<?php function foo() {}';
 
-        $reflector = new FunctionReflector(new StringSourceLocator($php, $this->astLocator), $this->classReflector);
-        $function  = $reflector->reflect('foo');
+        $reflector = new Reflector(new StringSourceLocator($php, $this->astLocator));
+        $function  = $reflector->reflectFunction('foo');
 
         self::assertTrue($function->isUserDefined());
         self::assertFalse($function->isInternal());
@@ -106,8 +105,8 @@ class ReflectionFunctionTest extends TestCase
 
     public function testIsInternal(): void
     {
-        $reflector = new FunctionReflector(new PhpInternalSourceLocator($this->astLocator, $this->sourceStubber), $this->classReflector);
-        $function  = $reflector->reflect('min');
+        $reflector = new Reflector(new PhpInternalSourceLocator($this->astLocator, $this->sourceStubber));
+        $function  = $reflector->reflectFunction('min');
 
         self::assertTrue($function->isInternal());
         self::assertFalse($function->isUserDefined());
@@ -203,8 +202,8 @@ class ReflectionFunctionTest extends TestCase
              */
             function foo() {}';
 
-        $reflector = new FunctionReflector(new StringSourceLocator($php, $this->astLocator), $this->classReflector);
-        $function  = $reflector->reflect('foo');
+        $reflector = new Reflector(new StringSourceLocator($php, $this->astLocator));
+        $function  = $reflector->reflectFunction('foo');
 
         $types = $function->getDocBlockReturnTypes();
 
@@ -241,8 +240,8 @@ class ReflectionFunctionTest extends TestCase
     {
         $php = '<?php function foo() {}';
 
-        $functionReflector  = new FunctionReflector(new StringSourceLocator($php, $this->astLocator), $this->classReflector);
-        $functionReflection = $functionReflector->reflect('foo');
+        $reflector          = new Reflector(new StringSourceLocator($php, $this->astLocator));
+        $functionReflection = $reflector->reflectFunction('foo');
 
         $this->expectException(FunctionDoesNotExist::class);
 
@@ -287,8 +286,8 @@ class ReflectionFunctionTest extends TestCase
     {
         $php = '<?php function foo() {}';
 
-        $functionReflector  = new FunctionReflector(new StringSourceLocator($php, $this->astLocator), $this->classReflector);
-        $functionReflection = $functionReflector->reflect('foo');
+        $reflector          = new Reflector(new StringSourceLocator($php, $this->astLocator));
+        $functionReflection = $reflector->reflectFunction('foo');
 
         $this->expectException(FunctionDoesNotExist::class);
 
@@ -299,8 +298,8 @@ class ReflectionFunctionTest extends TestCase
     {
         $php = '<?php function foo() {}';
 
-        $functionReflector  = new FunctionReflector(new StringSourceLocator($php, $this->astLocator), $this->classReflector);
-        $functionReflection = $functionReflector->reflect('foo');
+        $reflector          = new Reflector(new StringSourceLocator($php, $this->astLocator));
+        $functionReflection = $reflector->reflectFunction('foo');
 
         $this->expectException(FunctionDoesNotExist::class);
 
@@ -311,8 +310,8 @@ class ReflectionFunctionTest extends TestCase
     {
         $php = '<?php function foo() {}';
 
-        $functionReflector  = new FunctionReflector(new StringSourceLocator($php, $this->astLocator), $this->classReflector);
-        $functionReflection = $functionReflector->reflect('foo');
+        $reflector          = new Reflector(new StringSourceLocator($php, $this->astLocator));
+        $functionReflection = $reflector->reflectFunction('foo');
         $attributes         = $functionReflection->getAttributes();
 
         self::assertCount(0, $attributes);
@@ -320,8 +319,8 @@ class ReflectionFunctionTest extends TestCase
 
     public function testGetAttributesWithAttributes(): void
     {
-        $functionReflector  = new FunctionReflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/Attributes.php', $this->astLocator), $this->classReflector);
-        $functionReflection = $functionReflector->reflect('Roave\BetterReflectionTest\Fixture\functionWithAttributes');
+        $reflector          = new Reflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/Attributes.php', $this->astLocator));
+        $functionReflection = $reflector->reflectFunction('Roave\BetterReflectionTest\Fixture\functionWithAttributes');
         $attributes         = $functionReflection->getAttributes();
 
         self::assertCount(2, $attributes);
@@ -329,8 +328,8 @@ class ReflectionFunctionTest extends TestCase
 
     public function testGetAttributesByName(): void
     {
-        $functionReflector  = new FunctionReflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/Attributes.php', $this->astLocator), $this->classReflector);
-        $functionReflection = $functionReflector->reflect('Roave\BetterReflectionTest\Fixture\functionWithAttributes');
+        $reflector          = new Reflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/Attributes.php', $this->astLocator));
+        $functionReflection = $reflector->reflectFunction('Roave\BetterReflectionTest\Fixture\functionWithAttributes');
         $attributes         = $functionReflection->getAttributesByName(Attr::class);
 
         self::assertCount(1, $attributes);

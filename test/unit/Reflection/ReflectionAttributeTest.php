@@ -6,8 +6,7 @@ namespace Roave\BetterReflectionTest\Reflection;
 
 use Attribute;
 use PHPUnit\Framework\TestCase;
-use Roave\BetterReflection\Reflector\ClassReflector;
-use Roave\BetterReflection\Reflector\FunctionReflector;
+use Roave\BetterReflection\Reflector\Reflector;
 use Roave\BetterReflection\SourceLocator\Ast\Locator;
 use Roave\BetterReflection\SourceLocator\Type\SingleFileSourceLocator;
 use Roave\BetterReflectionTest\BetterReflectionSingleton;
@@ -23,21 +22,19 @@ use Roave\BetterReflectionTest\Fixture\ClassWithRepeatedAttributes;
 class ReflectionAttributeTest extends TestCase
 {
     private Locator $astLocator;
-    private ClassReflector $classReflector;
-    private FunctionReflector $functionReflector;
+    private Reflector $reflector;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->astLocator        = BetterReflectionSingleton::instance()->astLocator();
-        $this->classReflector    = new ClassReflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/Attributes.php', $this->astLocator));
-        $this->functionReflector = new FunctionReflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/Attributes.php', $this->astLocator), $this->classReflector);
+        $this->astLocator = BetterReflectionSingleton::instance()->astLocator();
+        $this->reflector  = new Reflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/Attributes.php', $this->astLocator));
     }
 
     public function testAttributes(): void
     {
-        $classReflection = $this->classReflector->reflect(ClassWithAttributes::class);
+        $classReflection = $this->reflector->reflectClass(ClassWithAttributes::class);
         $attributes      = $classReflection->getAttributes();
 
         self::assertCount(2, $attributes);
@@ -45,7 +42,7 @@ class ReflectionAttributeTest extends TestCase
 
     public function testRepeatedAttributes(): void
     {
-        $classReflection = $this->classReflector->reflect(ClassWithRepeatedAttributes::class);
+        $classReflection = $this->reflector->reflectClass(ClassWithRepeatedAttributes::class);
 
         $notRepeatedAttributes = $classReflection->getAttributesByName(Attr::class);
         self::assertCount(1, $notRepeatedAttributes);
@@ -58,7 +55,7 @@ class ReflectionAttributeTest extends TestCase
 
     public function testGetArgumentsWhenNoArguments(): void
     {
-        $classReflection = $this->classReflector->reflect(ClassWithAttributes::class);
+        $classReflection = $this->reflector->reflectClass(ClassWithAttributes::class);
         $attributes      = $classReflection->getAttributesByName(Attr::class);
 
         self::assertCount(1, $attributes);
@@ -67,7 +64,7 @@ class ReflectionAttributeTest extends TestCase
 
     public function testGetArgumentsWithArguments(): void
     {
-        $classReflection = $this->classReflector->reflect(ClassWithAttributesWithArguments::class);
+        $classReflection = $this->reflector->reflectClass(ClassWithAttributesWithArguments::class);
         $attributes      = $classReflection->getAttributesByName(Attr::class);
 
         self::assertCount(1, $attributes);
@@ -91,7 +88,7 @@ class ReflectionAttributeTest extends TestCase
 
     public function testGetTargetWithClass(): void
     {
-        $classReflection = $this->classReflector->reflect(ClassWithAttributes::class);
+        $classReflection = $this->reflector->reflectClass(ClassWithAttributes::class);
         $attributes      = $classReflection->getAttributes();
 
         self::assertNotEmpty($attributes);
@@ -100,7 +97,7 @@ class ReflectionAttributeTest extends TestCase
 
     public function testGetTargetWithClassConstant(): void
     {
-        $classReflection    = $this->classReflector->reflect(ClassWithAttributes::class);
+        $classReflection    = $this->reflector->reflectClass(ClassWithAttributes::class);
         $constantReflection = $classReflection->getReflectionConstant('CONSTANT_WITH_ATTRIBUTES');
         $attributes         = $constantReflection->getAttributes();
 
@@ -110,7 +107,7 @@ class ReflectionAttributeTest extends TestCase
 
     public function testGetTargetWithProperty(): void
     {
-        $classReflection    = $this->classReflector->reflect(ClassWithAttributes::class);
+        $classReflection    = $this->reflector->reflectClass(ClassWithAttributes::class);
         $propertyReflection = $classReflection->getProperty('propertyWithAttributes');
         $attributes         = $propertyReflection->getAttributes();
 
@@ -120,7 +117,7 @@ class ReflectionAttributeTest extends TestCase
 
     public function testGetTargetWithMethod(): void
     {
-        $classReflection  = $this->classReflector->reflect(ClassWithAttributes::class);
+        $classReflection  = $this->reflector->reflectClass(ClassWithAttributes::class);
         $methodReflection = $classReflection->getMethod('methodWithAttributes');
         $attributes       = $methodReflection->getAttributes();
 
@@ -130,7 +127,7 @@ class ReflectionAttributeTest extends TestCase
 
     public function testGetTargetWithParameter(): void
     {
-        $classReflection     = $this->classReflector->reflect(ClassWithAttributes::class);
+        $classReflection     = $this->reflector->reflectClass(ClassWithAttributes::class);
         $methodReflection    = $classReflection->getMethod('methodWithAttributes');
         $parameterReflection = $methodReflection->getParameter('parameterWithAttributes');
         $attributes          = $parameterReflection->getAttributes();
@@ -141,7 +138,7 @@ class ReflectionAttributeTest extends TestCase
 
     public function testGetTargetWithFunction(): void
     {
-        $functionReflection = $this->functionReflector->reflect('Roave\BetterReflectionTest\Fixture\functionWithAttributes');
+        $functionReflection = $this->reflector->reflectFunction('Roave\BetterReflectionTest\Fixture\functionWithAttributes');
         $attributes         = $functionReflection->getAttributes();
 
         self::assertNotEmpty($attributes);
