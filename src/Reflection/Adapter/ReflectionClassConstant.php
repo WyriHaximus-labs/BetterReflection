@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Roave\BetterReflection\Reflection\Adapter;
 
+use ReflectionAttribute as CoreReflectionAttribute;
 use ReflectionClassConstant as CoreReflectionClassConstant;
 use Roave\BetterReflection\Reflection\ReflectionClassConstant as BetterReflectionClassConstant;
 
@@ -91,9 +92,20 @@ class ReflectionClassConstant extends CoreReflectionClassConstant
     }
 
     /**
-     * {@inheritDoc}
+     * @phpcs:disable Squiz.Commenting.FunctionComment.InvalidNoReturn
+     * @return list<CoreReflectionAttribute>
      */
     public function getAttributes(?string $name = null, int $flags = 0): array
+    {
+        throw new Exception\NotImplemented('Not implemented');
+    }
+
+    public function isFinal(): bool
+    {
+        throw new Exception\NotImplemented('Not implemented');
+    }
+
+    public function isEnumCase(): bool
     {
         throw new Exception\NotImplemented('Not implemented');
     }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Roave\BetterReflection\Reflection\Adapter;
 
+use ReflectionAttribute as CoreReflectionAttribute;
+use ReflectionClass as CoreReflectionClass;
 use ReflectionException as CoreReflectionException;
 use ReflectionProperty as CoreReflectionProperty;
 use Roave\BetterReflection\Reflection\Exception\NoObjectProvided;
@@ -20,26 +22,20 @@ class ReflectionProperty extends CoreReflectionProperty
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->betterReflectionProperty->__toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->betterReflectionProperty->getName();
     }
 
     /**
-     * {@inheritDoc}
+     * @psalm-suppress MethodSignatureMismatch
      */
-    public function getValue($object = null)
+    public function getValue(?object $object = null): mixed
     {
         if (! $this->isAccessible()) {
             throw new CoreReflectionException('Property not accessible');
@@ -82,74 +78,47 @@ class ReflectionProperty extends CoreReflectionProperty
         return ReflectionType::fromTypeOrNull($this->betterReflectionProperty->getType());
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isPublic()
+    public function isPublic(): bool
     {
         return $this->betterReflectionProperty->isPublic();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isPrivate()
+    public function isPrivate(): bool
     {
         return $this->betterReflectionProperty->isPrivate();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isProtected()
+    public function isProtected(): bool
     {
         return $this->betterReflectionProperty->isProtected();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isStatic()
+    public function isStatic(): bool
     {
         return $this->betterReflectionProperty->isStatic();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isDefault()
+    public function isDefault(): bool
     {
         return $this->betterReflectionProperty->isDefault();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getModifiers()
+    public function getModifiers(): int
     {
         return $this->betterReflectionProperty->getModifiers();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getDeclaringClass()
+    public function getDeclaringClass(): CoreReflectionClass
     {
         return new ReflectionClass($this->betterReflectionProperty->getImplementingClass());
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getDocComment()
+    public function getDocComment(): string|false
     {
         return $this->betterReflectionProperty->getDocComment() ?: false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function setAccessible($accessible)
+    public function setAccessible(bool $accessible): void
     {
         $this->accessible = true;
     }
@@ -188,9 +157,15 @@ class ReflectionProperty extends CoreReflectionProperty
     }
 
     /**
-     * {@inheritDoc}
+     * @phpcs:disable Squiz.Commenting.FunctionComment.InvalidNoReturn
+     * @return list<CoreReflectionAttribute>
      */
     public function getAttributes(?string $name = null, int $flags = 0): array
+    {
+        throw new Exception\NotImplemented('Not implemented');
+    }
+
+    public function isReadOnly(): bool
     {
         throw new Exception\NotImplemented('Not implemented');
     }

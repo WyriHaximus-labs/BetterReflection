@@ -1174,7 +1174,7 @@ class ReflectionClass implements Reflection
      *
      * @link https://php.net/manual/en/reflectionclass.getinterfaces.php
      *
-     * @return array<string, ReflectionClass> An associative array of interfaces, with keys as interface names and the array
+     * @return array<class-string, ReflectionClass> An associative array of interfaces, with keys as interface names and the array
      *                                        values as {@see ReflectionClass} objects.
      */
     public function getInterfaces(): array
