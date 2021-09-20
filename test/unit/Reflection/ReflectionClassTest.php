@@ -2109,4 +2109,28 @@ PHP;
 
         self::assertCount(1, $attributes);
     }
+
+    public function testIsEnum(): void
+    {
+        $php = <<<'PHP'
+            <?php
+        
+            enum IsEnum
+            {
+                case Bar;
+            }
+
+            class IsNotEnum
+            {
+            }
+        PHP;
+
+        $reflector = new Reflector(new StringSourceLocator($php, $this->astLocator));
+
+        $isEnum = $reflector->reflectClass('IsEnum');
+        self::assertTrue($isEnum->isEnum());
+
+        $isNotEnum = $reflector->reflectClass('IsNotEnum');
+        self::assertFalse($isNotEnum->isEnum());
+    }
 }

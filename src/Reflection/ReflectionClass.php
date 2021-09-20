@@ -1325,6 +1325,11 @@ class ReflectionClass implements Reflection
         return $this->isInstantiable() && $this->implementsInterface(Traversable::class);
     }
 
+    public function isEnum(): bool
+    {
+        return $this->node instanceof Node\Stmt\Enum_;
+    }
+
     /**
      * @return array<class-string, ReflectionClass>
      */

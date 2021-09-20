@@ -441,6 +441,11 @@ class ReflectionObject extends ReflectionClass
         return $this->reflectionClass->isIterateable();
     }
 
+    public function isEnum(): bool
+    {
+        return $this->reflectionClass->isEnum();
+    }
+
     /**
      * {@inheritdoc}
      */
