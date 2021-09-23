@@ -102,7 +102,7 @@ class ReflectionClassConstant extends CoreReflectionClassConstant
 
     public function isFinal(): bool
     {
-        throw new Exception\NotImplemented('Not implemented');
+        return $this->betterClassConstant->isFinal();
     }
 
     public function isEnumCase(): bool

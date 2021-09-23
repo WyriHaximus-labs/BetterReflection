@@ -16,6 +16,8 @@ use Roave\BetterReflection\Util\GetLastDocComment;
 
 class ReflectionClassConstant
 {
+    public const IS_FINAL = 32;
+
     private bool $valueWasCached = false;
 
     /** @var scalar|array<scalar>|null const value */
@@ -109,6 +111,11 @@ class ReflectionClassConstant
         return $this->node->isProtected();
     }
 
+    public function isFinal(): bool
+    {
+        return $this->node->isFinal();
+    }
+
     /**
      * Returns a bitfield of the access modifiers for this constant
      */
@@ -118,6 +125,7 @@ class ReflectionClassConstant
         $val += $this->isPublic() ? CoreReflectionClassConstant::IS_PUBLIC : 0;
         $val += $this->isProtected() ? CoreReflectionClassConstant::IS_PROTECTED : 0;
         $val += $this->isPrivate() ? CoreReflectionClassConstant::IS_PRIVATE : 0;
+        $val += $this->isFinal() ? self::IS_FINAL : 0;
 
         return $val;
     }
