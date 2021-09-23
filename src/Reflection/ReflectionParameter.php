@@ -18,6 +18,7 @@ use PhpParser\Node\Stmt\Namespace_;
 use Roave\BetterReflection\NodeCompiler\CompileNodeToValue;
 use Roave\BetterReflection\NodeCompiler\CompilerContext;
 use Roave\BetterReflection\NodeCompiler\Exception\UnableToCompileNode;
+use Roave\BetterReflection\Reflection\Attribute\ReflectionAttributeHelper;
 use Roave\BetterReflection\Reflection\Exception\Uncloneable;
 use Roave\BetterReflection\Reflection\StringCast\ReflectionParameterStringCast;
 use Roave\BetterReflection\Reflector\ClassReflector;
@@ -571,5 +572,21 @@ class ReflectionParameter
     public function getAst(): ParamNode
     {
         return $this->node;
+    }
+
+    /**
+     * @return list<ReflectionAttribute>
+     */
+    public function getAttributes(): array
+    {
+        return ReflectionAttributeHelper::createAttributes($this->reflector, $this);
+    }
+
+    /**
+     * @return list<ReflectionAttribute>
+     */
+    public function getAttributesByName(string $name): array
+    {
+        return ReflectionAttributeHelper::filterAttributesByName($this->getAttributes(), $name);
     }
 }

@@ -20,6 +20,7 @@ use ReflectionClass as CoreReflectionClass;
 use ReflectionException;
 use ReflectionProperty as CoreReflectionProperty;
 use Roave\BetterReflection\BetterReflection;
+use Roave\BetterReflection\Reflection\Attribute\ReflectionAttributeHelper;
 use Roave\BetterReflection\Reflection\Exception\ClassDoesNotExist;
 use Roave\BetterReflection\Reflection\Exception\NoObjectProvided;
 use Roave\BetterReflection\Reflection\Exception\NotAClassReflection;
@@ -1476,6 +1477,22 @@ class ReflectionClass implements Reflection
     public function getDeclaringNamespaceAst(): ?Namespace_
     {
         return $this->declaringNamespace;
+    }
+
+    /**
+     * @return list<ReflectionAttribute>
+     */
+    public function getAttributes(): array
+    {
+        return ReflectionAttributeHelper::createAttributes($this->reflector, $this);
+    }
+
+    /**
+     * @return list<ReflectionAttribute>
+     */
+    public function getAttributesByName(string $name): array
+    {
+        return ReflectionAttributeHelper::filterAttributesByName($this->getAttributes(), $name);
     }
 
     /**

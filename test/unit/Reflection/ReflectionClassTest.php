@@ -43,10 +43,12 @@ use Roave\BetterReflectionTest\ClassWithInterfacesExtendingInterfaces;
 use Roave\BetterReflectionTest\ClassWithInterfacesOther;
 use Roave\BetterReflectionTest\Fixture;
 use Roave\BetterReflectionTest\Fixture\AbstractClass;
+use Roave\BetterReflectionTest\Fixture\Attr;
 use Roave\BetterReflectionTest\Fixture\ClassExtendingNonAbstractClass;
 use Roave\BetterReflectionTest\Fixture\ClassForHinting;
 use Roave\BetterReflectionTest\Fixture\ClassUsesTwoTraitsWithSameMethodNameOneIsAbstract;
 use Roave\BetterReflectionTest\Fixture\ClassUsingTraitWithAbstractMethod;
+use Roave\BetterReflectionTest\Fixture\ClassWithAttributes;
 use Roave\BetterReflectionTest\Fixture\ClassWithCaseInsensitiveMethods;
 use Roave\BetterReflectionTest\Fixture\ClassWithMissingParent;
 use Roave\BetterReflectionTest\Fixture\ExampleClass;
@@ -2079,5 +2081,32 @@ PHP;
         $class = $reflector->reflect('HasStringable');
 
         self::assertSame(['Iterator', 'Traversable', 'Stringable'], $class->getInterfaceNames());
+    }
+
+    public function testGetAttributesWithoutAttributes(): void
+    {
+        $classReflector  = new ClassReflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/ExampleClass.php', $this->astLocator));
+        $classReflection = $classReflector->reflect(ExampleClass::class);
+        $attributes      = $classReflection->getAttributes();
+
+        self::assertCount(0, $attributes);
+    }
+
+    public function testGetAttributesWithAttributes(): void
+    {
+        $classReflector  = new ClassReflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/Attributes.php', $this->astLocator));
+        $classReflection = $classReflector->reflect(ClassWithAttributes::class);
+        $attributes      = $classReflection->getAttributes();
+
+        self::assertCount(2, $attributes);
+    }
+
+    public function testGetAttributesByName(): void
+    {
+        $classReflector  = new ClassReflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/Attributes.php', $this->astLocator));
+        $classReflection = $classReflector->reflect(ClassWithAttributes::class);
+        $attributes      = $classReflection->getAttributesByName(Attr::class);
+
+        self::assertCount(1, $attributes);
     }
 }

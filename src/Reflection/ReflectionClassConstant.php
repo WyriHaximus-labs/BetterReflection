@@ -8,6 +8,7 @@ use PhpParser\Node\Stmt\ClassConst;
 use ReflectionProperty;
 use Roave\BetterReflection\NodeCompiler\CompileNodeToValue;
 use Roave\BetterReflection\NodeCompiler\CompilerContext;
+use Roave\BetterReflection\Reflection\Attribute\ReflectionAttributeHelper;
 use Roave\BetterReflection\Reflection\StringCast\ReflectionClassConstantStringCast;
 use Roave\BetterReflection\Reflector\Reflector;
 use Roave\BetterReflection\Util\CalculateReflectionColumn;
@@ -176,5 +177,21 @@ class ReflectionClassConstant
     public function getPositionInAst(): int
     {
         return $this->positionInNode;
+    }
+
+    /**
+     * @return list<ReflectionAttribute>
+     */
+    public function getAttributes(): array
+    {
+        return ReflectionAttributeHelper::createAttributes($this->reflector, $this);
+    }
+
+    /**
+     * @return list<ReflectionAttribute>
+     */
+    public function getAttributesByName(string $name): array
+    {
+        return ReflectionAttributeHelper::filterAttributesByName($this->getAttributes(), $name);
     }
 }

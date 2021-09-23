@@ -27,7 +27,9 @@ use Roave\BetterReflection\SourceLocator\Type\ComposerSourceLocator;
 use Roave\BetterReflection\SourceLocator\Type\SingleFileSourceLocator;
 use Roave\BetterReflection\SourceLocator\Type\StringSourceLocator;
 use Roave\BetterReflectionTest\BetterReflectionSingleton;
+use Roave\BetterReflectionTest\Fixture\Attr;
 use Roave\BetterReflectionTest\Fixture\ClassForHinting;
+use Roave\BetterReflectionTest\Fixture\ClassWithAttributes;
 use Roave\BetterReflectionTest\Fixture\ExampleClass;
 use Roave\BetterReflectionTest\Fixture\InitializedProperties;
 use Roave\BetterReflectionTest\Fixture\Php74PropertyTypeDeclarations;
@@ -744,5 +746,35 @@ PHP;
 
         $classReflection = $this->reflector->reflect(InitializedProperties::class);
         $classReflection->getProperty('withoutType')->isInitialized(new stdClass());
+    }
+
+    public function testGetAttributesWithoutAttributes(): void
+    {
+        $classReflector     = new ClassReflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/ExampleClass.php', $this->astLocator));
+        $classReflection    = $classReflector->reflect(ExampleClass::class);
+        $propertyReflection = $classReflection->getProperty('privateProperty');
+        $attributes         = $propertyReflection->getAttributes();
+
+        self::assertCount(0, $attributes);
+    }
+
+    public function testGetAttributesWithAttributes(): void
+    {
+        $classReflector     = new ClassReflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/Attributes.php', $this->astLocator));
+        $classReflection    = $classReflector->reflect(ClassWithAttributes::class);
+        $propertyReflection = $classReflection->getProperty('propertyWithAttributes');
+        $attributes         = $propertyReflection->getAttributes();
+
+        self::assertCount(2, $attributes);
+    }
+
+    public function testGetAttributesByName(): void
+    {
+        $classReflector     = new ClassReflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/Attributes.php', $this->astLocator));
+        $classReflection    = $classReflector->reflect(ClassWithAttributes::class);
+        $propertyReflection = $classReflection->getProperty('propertyWithAttributes');
+        $attributes         = $propertyReflection->getAttributesByName(Attr::class);
+
+        self::assertCount(1, $attributes);
     }
 }

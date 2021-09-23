@@ -15,8 +15,10 @@ use Roave\BetterReflection\Reflector\FunctionReflector;
 use Roave\BetterReflection\SourceLocator\Ast\Locator;
 use Roave\BetterReflection\SourceLocator\SourceStubber\SourceStubber;
 use Roave\BetterReflection\SourceLocator\Type\PhpInternalSourceLocator;
+use Roave\BetterReflection\SourceLocator\Type\SingleFileSourceLocator;
 use Roave\BetterReflection\SourceLocator\Type\StringSourceLocator;
 use Roave\BetterReflectionTest\BetterReflectionSingleton;
+use Roave\BetterReflectionTest\Fixture\Attr;
 use Roave\BetterReflectionTest\Fixture\ClassWithStaticMethod;
 use stdClass;
 
@@ -303,5 +305,34 @@ class ReflectionFunctionTest extends TestCase
         $this->expectException(FunctionDoesNotExist::class);
 
         $functionReflection->invokeArgs();
+    }
+
+    public function testGetAttributesWithoutAttributes(): void
+    {
+        $php = '<?php function foo() {}';
+
+        $functionReflector  = new FunctionReflector(new StringSourceLocator($php, $this->astLocator), $this->classReflector);
+        $functionReflection = $functionReflector->reflect('foo');
+        $attributes         = $functionReflection->getAttributes();
+
+        self::assertCount(0, $attributes);
+    }
+
+    public function testGetAttributesWithAttributes(): void
+    {
+        $functionReflector  = new FunctionReflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/Attributes.php', $this->astLocator), $this->classReflector);
+        $functionReflection = $functionReflector->reflect('Roave\BetterReflectionTest\Fixture\functionWithAttributes');
+        $attributes         = $functionReflection->getAttributes();
+
+        self::assertCount(2, $attributes);
+    }
+
+    public function testGetAttributesByName(): void
+    {
+        $functionReflector  = new FunctionReflector(new SingleFileSourceLocator(__DIR__ . '/../Fixture/Attributes.php', $this->astLocator), $this->classReflector);
+        $functionReflection = $functionReflector->reflect('Roave\BetterReflectionTest\Fixture\functionWithAttributes');
+        $attributes         = $functionReflection->getAttributesByName(Attr::class);
+
+        self::assertCount(1, $attributes);
     }
 }
