@@ -101,7 +101,7 @@ class ReflectionFunction extends ReflectionFunctionAbstract implements Reflectio
     }
 
     /**
-     * @param mixed[] $args
+     * @param list<mixed> $args
      *
      * @throws NotImplemented
      * @throws FunctionDoesNotExist

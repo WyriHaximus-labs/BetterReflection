@@ -324,7 +324,7 @@ class ReflectionParameter
     /**
      * Get the DocBlock type hints as an array of strings.
      *
-     * @return string[]
+     * @return list<string>
      */
     public function getDocBlockTypeStrings(): array
     {
@@ -345,7 +345,7 @@ class ReflectionParameter
      *
      * @see getTypeHint()
      *
-     * @return Type[]
+     * @return list<Type>
      */
     public function getDocBlockTypes(): array
     {

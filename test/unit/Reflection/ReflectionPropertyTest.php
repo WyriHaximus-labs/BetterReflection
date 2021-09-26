@@ -111,7 +111,7 @@ class ReflectionPropertyTest extends TestCase
     }
 
     /**
-     * @param string[] $expectedTypes
+     * @param list<string> $expectedTypes
      *
      * @dataProvider stringTypesDataProvider
      */
@@ -137,7 +137,7 @@ class ReflectionPropertyTest extends TestCase
     }
 
     /**
-     * @param string[] $expectedTypes
+     * @param list<string> $expectedTypes
      *
      * @dataProvider typesDataProvider
      */
@@ -199,7 +199,7 @@ class ReflectionPropertyTest extends TestCase
     }
 
     /**
-     * @param string[] $expectedModifierNames
+     * @param list<string> $expectedModifierNames
      *
      * @dataProvider modifierProvider
      */

@@ -288,7 +288,7 @@ class ReflectionMethod extends ReflectionFunctionAbstract
     }
 
     /**
-     * @param mixed[] $args
+     * @param list<mixed> $args
      *
      * @throws ClassDoesNotExist
      * @throws NoObjectProvided
@@ -308,7 +308,7 @@ class ReflectionMethod extends ReflectionFunctionAbstract
     }
 
     /**
-     * @param mixed[] $args
+     * @param list<mixed> $args
      */
     private function callStaticMethod(array $args): mixed
     {
@@ -322,7 +322,7 @@ class ReflectionMethod extends ReflectionFunctionAbstract
     }
 
     /**
-     * @param mixed[] $args
+     * @param list<mixed> $args
      */
     private function callObjectMethod(object $object, array $args): mixed
     {

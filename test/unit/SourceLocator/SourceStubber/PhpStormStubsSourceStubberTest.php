@@ -61,7 +61,7 @@ class PhpStormStubsSourceStubberTest extends TestCase
     }
 
     /**
-     * @return string[][]
+     * @return list<list<string>>
      */
     public function internalClassesProvider(): array
     {
@@ -262,7 +262,7 @@ class PhpStormStubsSourceStubberTest extends TestCase
     }
 
     /**
-     * @return string[][]
+     * @return list<list<string>>
      */
     public function internalFunctionsProvider(): array
     {
@@ -358,7 +358,7 @@ class PhpStormStubsSourceStubberTest extends TestCase
     }
 
     /**
-     * @return array<int, array<int, mixed>>
+     * @return list<list<mixed>>
      */
     public function internalConstantsProvider(): array
     {

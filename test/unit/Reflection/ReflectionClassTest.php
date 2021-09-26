@@ -864,7 +864,7 @@ PHP;
     }
 
     /**
-     * @param string[] $expectedModifierNames
+     * @param list<string> $expectedModifierNames
      *
      * @dataProvider modifierProvider
      */
