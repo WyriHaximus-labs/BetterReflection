@@ -234,6 +234,6 @@ class ReflectionFunction extends CoreReflectionFunction
 
     public function isStatic(): bool
     {
-        throw new Exception\NotImplemented('Not implemented');
+        return $this->betterReflectionFunction->isStatic();
     }
 }
