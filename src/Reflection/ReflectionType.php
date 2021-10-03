@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Roave\BetterReflection\Reflection;
 
+use Exception;
+use PhpParser\Node\ComplexType;
 use PhpParser\Node\Identifier;
+use PhpParser\Node\IntersectionType;
 use PhpParser\Node\Name;
 use PhpParser\Node\NullableType;
 use PhpParser\Node\UnionType;
@@ -15,7 +18,7 @@ abstract class ReflectionType
     {
     }
 
-    public static function createFromTypeAndReflector(Identifier|Name|NullableType|UnionType $type, bool $forceAllowsNull = false): ReflectionNamedType|ReflectionUnionType
+    public static function createFromTypeAndReflector(Identifier|Name|NullableType|ComplexType $type, bool $forceAllowsNull = false): ReflectionNamedType|ReflectionUnionType|ReflectionIntersectionType
     {
         $allowsNull = $forceAllowsNull;
         if ($type instanceof NullableType) {
@@ -23,11 +26,19 @@ abstract class ReflectionType
             $allowsNull = true;
         }
 
-        if ($type instanceof Identifier || $type instanceof Name) {
-            return new ReflectionNamedType($type, $allowsNull);
+        if ($type instanceof ComplexType) {
+            if ($type instanceof IntersectionType) {
+                return new ReflectionIntersectionType($type, $allowsNull);
+            }
+
+            if ($type instanceof UnionType) {
+                return new ReflectionUnionType($type, $allowsNull);
+            }
+
+            throw new Exception('We should never rich this!');
         }
 
-        return new ReflectionUnionType($type, $allowsNull);
+        return new ReflectionNamedType($type, $allowsNull);
     }
 
     /**

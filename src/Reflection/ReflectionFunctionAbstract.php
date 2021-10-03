@@ -359,7 +359,7 @@ abstract class ReflectionFunctionAbstract
     /**
      * Get the return type declaration (only for PHP 7+ code)
      */
-    public function getReturnType(): ReflectionNamedType|ReflectionUnionType|null
+    public function getReturnType(): ReflectionNamedType|ReflectionUnionType|ReflectionIntersectionType|null
     {
         $returnType = $this->node->getReturnType();
 

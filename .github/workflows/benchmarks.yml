@@ -5,8 +5,8 @@ name: "Benchmarks"
 on:
   pull_request:
   push:
-    branches:
-      - "master"
+#    branches:
+#      - "master"
 
 jobs:
   benchmarks:

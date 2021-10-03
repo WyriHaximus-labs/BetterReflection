@@ -176,7 +176,7 @@ class ReflectionParameter extends CoreReflectionParameter
         return $this->betterReflectionParameter->hasType();
     }
 
-    public function getType(): ReflectionNamedType|ReflectionUnionType|ReflectionType|null
+    public function getType(): ReflectionNamedType|ReflectionUnionType|ReflectionIntersectionType|ReflectionType|null
     {
         return ReflectionType::fromTypeOrNull($this->betterReflectionParameter->getType());
     }
