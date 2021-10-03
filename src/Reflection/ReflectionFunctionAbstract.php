@@ -360,7 +360,7 @@ abstract class ReflectionFunctionAbstract
     /**
      * Get the return type declaration
      */
-    public function getReturnType(): ReflectionNamedType|ReflectionUnionType|null
+    public function getReturnType(): ReflectionNamedType|ReflectionUnionType|ReflectionIntersectionType|null
     {
         $returnType = $this->node->getReturnType();
 
@@ -388,7 +388,7 @@ abstract class ReflectionFunctionAbstract
         return $this->hasReturnType();
     }
 
-    public function getTentativeReturnType(): ReflectionNamedType|ReflectionUnionType|null
+    public function getTentativeReturnType(): ReflectionNamedType|ReflectionUnionType|ReflectionIntersectionType|null
     {
         if ($this->isUserDefined()) {
             return null;

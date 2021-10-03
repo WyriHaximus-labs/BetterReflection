@@ -6,6 +6,7 @@ namespace Roave\BetterReflection\Reflection;
 
 use PhpParser\Node\ComplexType;
 use PhpParser\Node\Identifier;
+use PhpParser\Node\IntersectionType;
 use PhpParser\Node\Name;
 use PhpParser\Node\NullableType;
 
@@ -15,7 +16,7 @@ abstract class ReflectionType
     {
     }
 
-    public static function createFromTypeAndReflector(Identifier|Name|ComplexType $type, bool $forceAllowsNull = false): ReflectionNamedType|ReflectionUnionType
+    public static function createFromTypeAndReflector(Identifier|Name|NullableType|ComplexType $type, bool $forceAllowsNull = false): ReflectionNamedType|ReflectionUnionType|ReflectionIntersectionType
     {
         $allowsNull = $forceAllowsNull;
         if ($type instanceof NullableType) {
@@ -25,6 +26,10 @@ abstract class ReflectionType
 
         if ($type instanceof Identifier || $type instanceof Name) {
             return new ReflectionNamedType($type, $allowsNull);
+        }
+
+        if ($type instanceof IntersectionType) {
+            return new ReflectionIntersectionType($type, $allowsNull);
         }
 
         /**

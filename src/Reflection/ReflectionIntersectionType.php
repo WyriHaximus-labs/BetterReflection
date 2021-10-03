@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Roave\BetterReflection\Reflection;
 
-use PhpParser\Node\UnionType;
+use PhpParser\Node\IntersectionType;
 
 use function array_filter;
 use function array_map;
 use function implode;
 
-class ReflectionUnionType extends ReflectionType
+class ReflectionIntersectionType extends ReflectionType
 {
-    /** @var list<ReflectionNamedType|ReflectionUnionType> */
+    /** @var list<ReflectionNamedType> */
     private array $types;
 
-    public function __construct(UnionType $type, bool $allowsNull)
+    public function __construct(IntersectionType $type, bool $allowsNull)
     {
         parent::__construct($allowsNull);
         $this->types = array_filter(
@@ -25,7 +25,7 @@ class ReflectionUnionType extends ReflectionType
     }
 
     /**
-     * @return list<ReflectionNamedType|ReflectionUnionType>
+     * @return list<ReflectionNamedType>
      */
     public function getTypes(): array
     {
@@ -34,6 +34,6 @@ class ReflectionUnionType extends ReflectionType
 
     public function __toString(): string
     {
-        return implode('|', array_map(static fn (ReflectionType $type): string => (string) $type, $this->types));
+        return implode('&', array_map(static fn (ReflectionNamedType $type): string => (string) $type, $this->types));
     }
 }

@@ -12,9 +12,9 @@ use Roave\BetterReflection\Reflection\ReflectionUnionType as BetterReflectionUni
 use function array_filter;
 use function array_map;
 
-class ReflectionUnionType extends CoreReflectionUnionType
+class ReflectionIntersectionType extends CoreReflectionUnionType
 {
-    public function __construct(private BetterReflectionUnionType $betterReflectionType)
+    public function __construct(private BetterReflectionIntersectionType $betterReflectionType)
     {
     }
 
